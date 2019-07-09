@@ -14,7 +14,7 @@ function getData (url = '') {
   }).then(response => response.json())
 }
 
-const markerPopups = {
+const markerPopupTransformer = {
   group: (popup, item) => popup.setHTML(`
     <h3>${item.name}</h3>
     <p>${item.description}</p>
@@ -35,8 +35,8 @@ const markerPopups = {
 function createMarker(item) {
   var popup = new mapboxgl.Popup({ offset: 25 })
 
-  
-   
+  markerPopupTransformer[item.kind](popup, item)
+
   // create DOM element for the marker
   var el = document.createElement('div')
   el.id = `marker-${item.id}`
