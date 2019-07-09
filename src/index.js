@@ -1,4 +1,5 @@
 import 'normalize.css/normalize.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import './styles/index.scss'
 
 import mapboxgl from 'mapbox-gl';
