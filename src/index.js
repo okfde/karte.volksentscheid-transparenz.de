@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     center: [13.4, 52.5],
     zoom: 12,
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/mapbox/light-v10',
     maxBounds: bounds
   });
 
