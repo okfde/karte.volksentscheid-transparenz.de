@@ -127,7 +127,13 @@ module.exports = {
         new OptimizeCssAssetsPlugin({
             cssProcessor: require('cssnano'),
             cssProcessorOptions: {
-                preset: 'normal'
+                map: {
+                    inline: false,
+                },
+                discardComments: {
+                    removeAll: true
+                },
+                discardUnused: false
             },
             canPrint: true
         })
