@@ -16,56 +16,76 @@ function getData (url = '') {
 }
 
 const markerPopupTransformer = {
-  group: (popup, item) => popup.setHTML(`
-    <h3>${item.name}</h3>
-    <p>${item.description}</p>
-    <a href="${item.url}">Mitmachen</a>
+  group: (popup, props) => popup.setHTML(`
+    <h3>${props.name}</h3>
+    <p>${props.description}</p>
+    <a href="${props.url}">Mitmachen</a>
   `),
-  location: (popup, item) => popup.setHTML(`
-    <h3>${item.name}</h3>
-    <p>${item.description}</p>
-    <a href="${item.url}">Mitmachen</a>
+  location: (popup, props) => popup.setHTML(`
+    <h3>${props.name}</h3>
+    <p>${props.description}</p>
   `),
-  event: (popup, item) => popup.setHTML(`
-    <h3>${item.name}</h3>
-    <p>${item.description}</p>
-    <a href="${item.url}">Mitmachen</a>
+  event: (popup, props) => popup.setHTML(`
+    <h3>${props.name}</h3>
+    <p>${props.description}</p>
   `)
 }
 
-function createMarker(item) {
-  var popup = new mapboxgl.Popup({ offset: 25 })
+function setFeatureOnPopup(feature, popup) {
+  const props = feature.properties 
+  markerPopupTransformer[props.kind](popup, props)
+  popup.setLngLat(feature.geometry.coordinates)
+  return popup
+}
 
-  markerPopupTransformer[item.kind](popup, item)
-
+function createMarker(feature) {
+  const popup = createPopup(feature)
+  const props = feature.properties
   // create DOM element for the marker
   var el = document.createElement('div')
   el.id = `marker-${item.id}`
-  el.className = `marker marker-${item.kind}`
-  
-  // create the marker
-  return new mapboxgl.Marker(el)
-    .setLngLat(item.geo.coordinates)
-    .setPopup(popup) // sets a popup on this marker
+  el.className = `marker marker-${props.kind}`
 
+  return new mapboxgl.Marker(el)
+    .setLngLat(feature.geometry.coordinates)
+    .setPopup(popup) // sets a popup on this marker
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  var bounds = [
-    [12.9, 52.3], // Southwest coordinates
-    [13.8, 52.7]  // Northeast coordinates
-  ];
-
-  mapboxgl.accessToken = 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p4dzFwcDZiMGE2YjNjcGZvcHR0a2RhNSJ9.lKwaDaYgB-SX7eYJ6tmxLA';
-  const map = new mapboxgl.Map({
-    center: [13.4, 52.5],
-    zoom: 12,
-    container: 'map',
-    style: 'mapbox://styles/mapbox/light-v10',
-    maxBounds: bounds
+function featureClick (e) {
+  const feature = e.features[0]
+  const popup = new mapboxgl.Popup({ offset: 10 })
+  setFeatureOnPopup(feature, popup)
+  popup.addTo(map)
+  map.flyTo({
+    center: feature.geometry.coordinates
   });
+}
 
+function featureHover (e) {
+  map.getCanvas().style.cursor = 'pointer';
+}
+
+function featureUnhover (e) {
+  map.getCanvas().style.cursor = '';
+}
+
+
+var bounds = [
+  [12.9, 52.3], // Southwest coordinates
+  [13.8, 52.7]  // Northeast coordinates
+];
+
+mapboxgl.accessToken = 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p4dzFwcDZiMGE2YjNjcGZvcHR0a2RhNSJ9.lKwaDaYgB-SX7eYJ6tmxLA';
+const map = new mapboxgl.Map({
+  center: [13.4, 52.5],
+  zoom: 12,
+  container: 'map',
+  // style: 'mapbox://styles/okfde/cjxxj9npi0eo41cp7pe2hufp1',
+  style: 'mapbox://styles/mapbox/light-v10',
+  maxBounds: bounds
+});
+
+document.addEventListener("DOMContentLoaded", () => {
   const mapLoaded = new Promise((resolve) => {
     map.on('load', () => {
       map.resize()
@@ -75,13 +95,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const dataReady = getData(COLLECTION_URL)
   Promise.all([dataReady, mapLoaded]).then((promiseResults) => {
+    const data = promiseResults[0]
+    console.log(data)
+    map.setLayoutProperty('country-label', 'text-field', ['get', 'name_de']);
 
-    promiseResults[0].forEach((item) => {
-      console.log(item)
-      const marker = createMarker(item)
-      marker.addTo(map)
-      console.log(marker)
+    map.addSource("collection", {
+      "type": "geojson",
+      "data": data
     })
+
+    map.addLayer({
+      "id": "groups",
+      "type": "circle",
+      "source": "collection",
+      "paint": {
+        "circle-radius": 6,
+        "circle-color": "#B42222"
+      },
+      "filter": ["==", "kind", "group"],
+    });
+
+    map.on('click', 'groups', featureClick);
+    map.on('mouseenter', 'groups', featureHover)
+    map.on('mouseleave', 'groups', featureUnhover);
+
+    map.addLayer({
+      "id": "locations",
+      "type": "circle",
+      "source": "collection",
+      "paint": {
+        "circle-radius": 6,
+        "circle-color": "#0033ee"
+      },
+      "filter": ["==", "kind", "location"],
+    });
+
+    map.on('click', 'locations', featureClick);
+    map.on('mouseenter', 'locations', featureHover)
+    map.on('mouseleave', 'locations', featureUnhover);
+
+
   })
   
 });
