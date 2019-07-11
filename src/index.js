@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "circle",
       "source": "collection",
       "paint": {
-        "circle-radius": 6,
+        "circle-radius": 10,
         "circle-color": "#B42222"
       },
       "filter": ["==", "kind", "group"],
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "circle",
       "source": "collection",
       "paint": {
-        "circle-radius": 6,
+        "circle-radius": 4,
         "circle-color": "#0033ee"
       },
       "filter": ["==", "kind", "location"],
