@@ -19,15 +19,18 @@ const markerPopupTransformer = {
   group: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
     <p>${props.description}</p>
-    <a href="${props.url}">Mitmachen</a>
+    <p><a target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
   location: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
+    <p>${props.address}</p>
     <p>${props.description}</p>
+    <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
   `),
   event: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
     <p>${props.description}</p>
+    <p><a target="_blank" href="${props.url}">Beim Termin mithelfen!</a></p>
   `)
 }
 
