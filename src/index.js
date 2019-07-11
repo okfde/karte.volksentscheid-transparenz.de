@@ -78,7 +78,7 @@ var bounds = [
 mapboxgl.accessToken = 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p4dzFwcDZiMGE2YjNjcGZvcHR0a2RhNSJ9.lKwaDaYgB-SX7eYJ6tmxLA';
 const map = new mapboxgl.Map({
   center: [13.4, 52.5],
-  zoom: 12,
+  zoom: 10,
   container: 'map',
   // style: 'mapbox://styles/okfde/cjxxj9npi0eo41cp7pe2hufp1',
   style: 'mapbox://styles/mapbox/light-v10',
