@@ -1,6 +1,7 @@
 const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
     devtool: 'eval-cheap-module-source-map',
@@ -57,11 +58,10 @@ module.exports = {
                 test: /\.(png|jpg|gif)$/,
                 use: [
                     {
-                        loader: 'url-loader',
+                        loader: 'file-loader',
                         options: {
                             // On development we want to see where the file is coming from, hence we preserve the [path]
-                            name: '[path][name].[ext]?hash=[hash:20]',
-                            limit: 8192
+                            name: '[name].[hash:20].[ext]',
                         }
                     }
                 ]
@@ -82,6 +82,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './index.html',
             inject: true
-        })
+        }),
+        new CopyWebpackPlugin([
+            { from: './src/assets', to: 'public' }
+        ])
     ]
 };
