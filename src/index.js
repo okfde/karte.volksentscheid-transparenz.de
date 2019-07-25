@@ -16,9 +16,11 @@ function getData (url = '') {
 }
 
 const makeEvent = (popup, props) => {
+  // mapboxgl.js converts deeper keys to JSON
+  let details = JSON.parse(props.details)
   popup.setHTML(`
     <h3>${props.name}</h3>
-    <p>Am ${props.details.start_format} - ${props.details.end_format}</p>
+    <p>Am ${details.start_format} - ${details.end_format} Uhr</p>
     <p>${props.description}</p>
     <p><a class="btn" target="_blank" href="${props.url}">Beim Termin mithelfen!</a></p>
   `)
@@ -61,11 +63,24 @@ function createMarker(feature) {
     .setPopup(popup) // sets a popup on this marker
 }
 
+let justOpened = false
+
+const openedPopup = () => {
+  justOpened = true
+  window.setTimeout(() => {
+    justOpened = false
+  }, 500);
+}
+
 function featureClick (e) {
+  if (justOpened) {
+    return;
+  }
   const feature = e.features[0]
   const popup = new mapboxgl.Popup({ offset: 10 })
   setFeatureOnPopup(feature, popup)
   popup.addTo(map)
+  openedPopup()
   map.flyTo({
     center: feature.geometry.coordinates
   });
@@ -78,6 +93,9 @@ function featureHover (e) {
 function featureUnhover (e) {
   map.getCanvas().style.cursor = '';
 }
+
+const metersToPixelsAtMaxZoom = (meters, latitude) =>
+  meters / 0.075 / Math.cos(latitude * Math.PI / 180)
 
 var icons = [
   ['group', './public/embassy-15.svg.png'],
@@ -133,12 +151,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.addLayer({
       "id": "groups",
+      "type": "circle",
+      "source": "collection",
+      "paint": {
+        "circle-radius": {
+          "stops": [
+            [0, 0],
+            [20, metersToPixelsAtMaxZoom(450, 52)]
+          ],
+          "base": 2
+        },
+        "circle-color": "rgba(128,128,128,0.5)"
+      },
+      "filter": ["==", "kind", "group"],
+    });
+
+    map.addLayer({
+      "id": "groups_marker",
       "type": "symbol",
       "source": "collection",
-      // "paint": {
-      //   "circle-radius": 10,
-      //   "circle-color": "#B42222"
-      // },
+
       "filter": ["==", "kind", "group"],
 
       "layout": {
@@ -154,9 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    map.on('click', 'groups', featureClick);
-    map.on('mouseenter', 'groups', featureHover)
-    map.on('mouseleave', 'groups', featureUnhover);
+    map.on('click', 'groups_marker', featureClick);
+    map.on('mouseenter', 'groups_marker', featureHover)
+    map.on('mouseleave', 'groups_marker', featureUnhover);
 
     map.addLayer({
       "id": "locations",
@@ -210,6 +242,10 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on('click', 'events', featureClick);
     map.on('mouseenter', 'events', featureHover)
     map.on('mouseleave', 'events', featureUnhover);
+
+    map.on('click', 'groups', featureClick);
+    map.on('mouseenter', 'groups', featureHover)
+    map.on('mouseleave', 'groups', featureUnhover);
 
 
   })
