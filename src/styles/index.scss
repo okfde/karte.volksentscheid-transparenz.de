@@ -11,15 +11,28 @@ body {
   height: 100vh;
 }
 
-a, a:visited {
-  color: blue;
-}
+.mapboxgl-popup-content {
+  font-size: 1rem;
+  line-height: 1.3rem;
 
-a.btn, a.btn:visited {
-  display: inline-block;
-  color: #fff;
-  background: #0000bb;
-  padding: 2px 5px;
-  text-decoration: none;
-  border-radius: 3px;
+  a, a:visited {
+    color: blue;
+  }
+
+  a.btn, a.btn:visited {
+    display: inline-block;
+    color: #fff;
+    background: #000;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 3px;
+    box-shadow: 0px 2px 5px 1px #999;
+    display: block;
+    text-align: center;
+    font-weight: bold;
+  }
+  a.btn:hover {
+    color: #000;
+    background: #fff;
+  }
 }
