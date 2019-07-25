@@ -19,7 +19,8 @@ const markerPopupTransformer = {
   group: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
     <p>${props.description}</p>
-    <p><a target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
+    <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
+    <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
   location: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
@@ -72,6 +73,11 @@ function featureUnhover (e) {
   map.getCanvas().style.cursor = '';
 }
 
+var icons = [
+  ['group', './public/embassy-15.svg.png'],
+  ['location', './public/marker-11.svg.png'],
+  ['event', './public/star-15.svg.png'],
+]
 
 var bounds = [
   [12.9, 52.3], // Southwest coordinates
@@ -96,8 +102,20 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   })
 
+  const loadIcons = icons.map((icon) => {
+    return new Promise((resolve, reject) => {
+      map.loadImage(icon[1], (error, image) => {
+        if (error) {
+          return reject(error);
+        }
+        map.addImage(icon[0], image);
+        resolve()
+      })
+    })
+  })
+
   const dataReady = getData(COLLECTION_URL)
-  Promise.all([dataReady, mapLoaded]).then((promiseResults) => {
+  Promise.all([dataReady, mapLoaded, ...loadIcons]).then((promiseResults) => {
     const data = promiseResults[0]
     console.log(data)
     map.setLayoutProperty('country-label', 'text-field', ['get', 'name_de']);
@@ -109,13 +127,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.addLayer({
       "id": "groups",
-      "type": "circle",
+      "type": "symbol",
       "source": "collection",
-      "paint": {
-        "circle-radius": 10,
-        "circle-color": "#B42222"
-      },
+      // "paint": {
+      //   "circle-radius": 10,
+      //   "circle-color": "#B42222"
+      // },
       "filter": ["==", "kind", "group"],
+
+      "layout": {
+        "icon-image": "group",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
     });
 
     map.on('click', 'groups', featureClick);
@@ -124,18 +154,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.addLayer({
       "id": "locations",
-      "type": "circle",
+      "type": "symbol",
       "source": "collection",
-      "paint": {
-        "circle-radius": 4,
-        "circle-color": "#0033ee"
-      },
+      // "paint": {
+      //   "circle-radius": 4,
+      //   "circle-color": "#0033ee"
+      // },
       "filter": ["==", "kind", "location"],
+      "layout": {
+        "icon-image": "location",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
     });
 
     map.on('click', 'locations', featureClick);
     map.on('mouseenter', 'locations', featureHover)
     map.on('mouseleave', 'locations', featureUnhover);
+
+    map.addLayer({
+      "id": "events",
+      "type": "symbol",
+      "source": "collection",
+      // "paint": {
+      //   "circle-radius": 4,
+      //   "circle-color": "#ff33ee"
+      // },
+      "filter": ["==", "kind", "event"],
+
+      "layout": {
+        "icon-image": "event",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
+    });
+
+    map.on('click', 'events', featureClick);
+    map.on('mouseenter', 'events', featureHover)
+    map.on('mouseleave', 'events', featureUnhover);
 
 
   })

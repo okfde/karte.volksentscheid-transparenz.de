@@ -1,6 +1,7 @@
 body {
   margin:0;
   padding:0;
+  font-family: sans-serif;
 }
 
 #map {
@@ -10,26 +11,15 @@ body {
   height: 100vh;
 }
 
-
-.marker {
-  border-radius: 50%;
-  cursor: pointer;
+a, a:visited {
+  color: blue;
 }
 
-.marker-group {
-  background-color: red;
-  width: 20px;
-  height: 20px;
-}
-
-.marker-location {
-  background-color: blue;
-  width: 10px;
-  height: 10px;
-}
-
-.marker-event {
-  background-color: orange;
-  width: 20px;
-  height: 20px;
+a.btn, a.btn:visited {
+  display: inline-block;
+  color: #fff;
+  background: #0000bb;
+  padding: 2px 5px;
+  text-decoration: none;
+  border-radius: 3px;
 }
