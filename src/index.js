@@ -15,24 +15,30 @@ function getData (url = '') {
   }).then(response => response.json())
 }
 
+const makeEvent = (popup, props) => {
+  popup.setHTML(`
+    <h3>${props.name}</h3>
+    <p>Am ${props.details.start_format} - ${props.details.end_format}</p>
+    <p>${props.description}</p>
+    <p><a class="btn" target="_blank" href="${props.url}">Beim Termin mithelfen!</a></p>
+  `)
+}
+
 const markerPopupTransformer = {
   group: (popup, props) => popup.setHTML(`
-    <h3>${props.name}</h3>
+    <h3>Sammelgruppe ${props.name}</h3>
     <p>${props.description}</p>
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
     <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
   location: (popup, props) => popup.setHTML(`
     <h3>${props.name}</h3>
-    <p>${props.address}</p>
+    <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
+    <p>${props.details.address ? props.details.address : ''}</p>
     <p>${props.description}</p>
     <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
   `),
-  event: (popup, props) => popup.setHTML(`
-    <h3>${props.name}</h3>
-    <p>${props.description}</p>
-    <p><a target="_blank" href="${props.url}">Beim Termin mithelfen!</a></p>
-  `)
+  event: makeEvent
 }
 
 function setFeatureOnPopup(feature, popup) {
