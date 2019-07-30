@@ -20,25 +20,25 @@ const makeEvent = (popup, props) => {
   let details = JSON.parse(props.details)
   popup.setHTML(`
     <h3>${props.name}</h3>
-    <p>Am ${details.start_format} - ${details.end_format} Uhr</p>
-    <p>${props.description}</p>
-    <p><a class="btn" target="_blank" href="${props.url}">Beim Termin mithelfen!</a></p>
+    <p>${details.start_format} - ${details.end_format}&nbsp;Uhr</p>
+    <p><a class="btn" target="_blank" href="${props.url}">Mehr Infos &rarr;</a></p>
   `)
 }
 
 const markerPopupTransformer = {
   group: (popup, props) => popup.setHTML(`
     <h3>Sammelgruppe ${props.name}</h3>
-    <p>${props.description}</p>
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
     <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
   location: (popup, props) => popup.setHTML(`
+    <div class="location">
     <h3>${props.name}</h3>
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
     <p>${props.details.address ? props.details.address : ''}</p>
     <p>${props.description}</p>
     <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
+    </div>
   `),
   event: makeEvent
 }
@@ -81,9 +81,9 @@ function featureClick (e) {
   setFeatureOnPopup(feature, popup)
   popup.addTo(map)
   openedPopup()
-  map.flyTo({
-    center: feature.geometry.coordinates
-  });
+  // map.flyTo({
+  //   center: feature.geometry.coordinates
+  // });
 }
 
 function featureHover (e) {
