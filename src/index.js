@@ -138,11 +138,31 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   })
 
+  const dateSort = function(a, b){
+    if (!a.properties.details.start || !b.properties.details.start) {
+      if (a.properties.details.start) {
+        return 1
+      }
+      if (b.properties.details.start) {
+        return -1
+      }
+      return 0
+    }
+    var keyA = new Date(a.properties.details.start),
+        keyB = new Date(b.properties.details.start);
+    // Compare the 2 dates
+    if(keyA < keyB) return -1;
+    if(keyA > keyB) return 1;
+    return 0;
+  }
+
   const dataReady = getData(COLLECTION_URL)
   Promise.all([dataReady, mapLoaded, ...loadIcons]).then((promiseResults) => {
     const data = promiseResults[0]
-    console.log(data)
     map.setLayoutProperty('country-label', 'text-field', ['get', 'name_de']);
+
+    // sort closer dates higher
+    data.features.sort(dateSort)
 
     map.addSource("collection", {
       "type": "geojson",
@@ -228,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       "layout": {
         "icon-image": "event",
+        "symbol-z-order": "source",
         "icon-size": [
           'interpolate',
           ['linear'],
