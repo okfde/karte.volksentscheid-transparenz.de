@@ -187,30 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     map.addLayer({
-      "id": "groups_marker",
-      "type": "symbol",
-      "source": "collection",
-
-      "filter": ["==", "kind", "group"],
-
-      "layout": {
-        "icon-image": "group",
-        "icon-size": [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          10, 0.4,
-          12, 0.6,
-          14, 1,
-        ]
-      }
-    });
-
-    map.on('click', 'groups_marker', featureClick);
-    map.on('mouseenter', 'groups_marker', featureHover)
-    map.on('mouseleave', 'groups_marker', featureUnhover);
-
-    map.addLayer({
       "id": "locations",
       "type": "symbol",
       "source": "collection",
@@ -235,6 +211,30 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on('click', 'locations', featureClick);
     map.on('mouseenter', 'locations', featureHover)
     map.on('mouseleave', 'locations', featureUnhover);
+
+    map.addLayer({
+      "id": "groups_marker",
+      "type": "symbol",
+      "source": "collection",
+
+      "filter": ["==", "kind", "group"],
+
+      "layout": {
+        "icon-image": "group",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
+    });
+
+    map.on('click', 'groups_marker', featureClick);
+    map.on('mouseenter', 'groups_marker', featureHover)
+    map.on('mouseleave', 'groups_marker', featureUnhover);
 
     map.addLayer({
       "id": "events",
