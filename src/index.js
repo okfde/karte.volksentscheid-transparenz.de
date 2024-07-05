@@ -1,8 +1,11 @@
-import 'normalize.css/normalize.css'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import './styles/index.scss'
+import maplibregl from 'maplibre-gl';
 
-import mapboxgl from 'mapbox-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import 'normalize.css/normalize.css';
+import groupIcon from './assets/embassy-15.svg.png';
+import locationIcon from './assets/marker-11.svg.png';
+import eventIcon from './assets/star-15.svg.png';
+import './styles/index.scss';
 
 const COLLECTION_URL = 'https://orga.volksentscheid-transparenz.de/api/collection/'
 
@@ -16,7 +19,6 @@ function getData (url = '') {
 }
 
 const makeEvent = (popup, props) => {
-  // mapboxgl.js converts deeper keys to JSON
   let details = JSON.parse(props.details)
   popup.setHTML(`
     <h3>${props.name}</h3>
@@ -58,7 +60,7 @@ function createMarker(feature) {
   el.id = `marker-${item.id}`
   el.className = `marker marker-${props.kind}`
 
-  return new mapboxgl.Marker(el)
+  return new maplibregl.Marker(el)
     .setLngLat(feature.geometry.coordinates)
     .setPopup(popup) // sets a popup on this marker
 }
@@ -77,7 +79,7 @@ function featureClick (e) {
     return;
   }
   const feature = e.features[0]
-  const popup = new mapboxgl.Popup({ offset: 10 })
+  const popup = new maplibregl.Popup({ offset: 10 })
   setFeatureOnPopup(feature, popup)
   popup.addTo(map)
   openedPopup()
@@ -98,9 +100,9 @@ const metersToPixelsAtMaxZoom = (meters, latitude) =>
   meters / 0.075 / Math.cos(latitude * Math.PI / 180)
 
 var icons = [
-  ['group', './public/embassy-15.svg.png'],
-  ['location', './public/marker-11.svg.png'],
-  ['event', './public/star-15.svg.png'],
+  ['group', groupIcon],
+  ['location', locationIcon],
+  ['event', eventIcon],
 ]
 
 var bounds = [
@@ -108,13 +110,12 @@ var bounds = [
   [13.8, 52.7]  // Northeast coordinates
 ];
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoib2tmZGUiLCJhIjoiY2p4dzFwcDZiMGE2YjNjcGZvcHR0a2RhNSJ9.lKwaDaYgB-SX7eYJ6tmxLA';
-const map = new mapboxgl.Map({
+
+const map = new maplibregl.Map({
   center: [13.4, 52.5],
   zoom: 10,
   container: 'map',
-  // style: 'mapbox://styles/okfde/cjxxj9npi0eo41cp7pe2hufp1',
-  style: 'mapbox://styles/mapbox/light-v10',
+  style: 'https://tiles.versatiles.org/assets/styles/graybeard.json',
   maxBounds: bounds
 });
 
@@ -128,12 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const loadIcons = icons.map((icon) => {
     return new Promise((resolve, reject) => {
-      map.loadImage(icon[1], (error, image) => {
-        if (error) {
-          return reject(error);
-        }
-        map.addImage(icon[0], image);
+      map.loadImage(icon[1]).then((image) => {
+        map.addImage(icon[0], image.data);
         resolve()
+      }).catch((error) => {
+        console.error('Error loading icon', error)
+        reject(error)
       })
     })
   })
@@ -156,10 +157,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return 0;
   }
 
-  const dataReady = getData(COLLECTION_URL)
+  const dataReady = getData(COLLECTION_URL).catch((error) => {
+    console.error('Error fetching collection data', error)
+  })
   Promise.all([dataReady, mapLoaded, ...loadIcons]).then((promiseResults) => {
     const data = promiseResults[0]
-    map.setLayoutProperty('country-label', 'text-field', ['get', 'name_de']);
 
     // sort closer dates higher
     data.features.sort(dateSort)
