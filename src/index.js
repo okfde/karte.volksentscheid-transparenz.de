@@ -7,7 +7,8 @@ import locationIcon from './assets/marker-11.svg.png';
 import eventIcon from './assets/star-15.svg.png';
 import './styles/index.scss';
 
-const COLLECTION_URL = 'https://orga.volksentscheid-transparenz.de/api/collection/'
+
+const COLLECTION_URL = 'https://orga.baumentscheid.mapnificent.de/api/collection/'
 
 function getData (url = '') {
   return window.fetch(url, {
