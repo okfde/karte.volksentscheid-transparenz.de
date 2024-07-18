@@ -8,7 +8,7 @@ import eventIcon from './assets/star-15.svg.png';
 import './styles/index.scss';
 
 
-const COLLECTION_URL = 'https://orga.baumentscheid.mapnificent.de/api/collection/'
+const COLLECTION_URL = 'https://orga.baumentscheid.de/api/collection/'
 
 function getData (url = '') {
   return window.fetch(url, {
