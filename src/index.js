@@ -19,8 +19,7 @@ function getData (url = '') {
   }).then(response => response.json())
 }
 
-const makeEvent = (popup, props) => {
-  let details = JSON.parse(props.details)
+const makeEvent = (popup, props, details) => {
   popup.setHTML(`
     <h3>${props.name}</h3>
     <p>${details.start_format} - ${details.end_format}&nbsp;Uhr</p>
@@ -34,11 +33,11 @@ const markerPopupTransformer = {
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
     <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
-  location: (popup, props) => popup.setHTML(`
+  location: (popup, props, details) => popup.setHTML(`
     <div class="location">
     <h3>${props.name}</h3>
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
-    <p>${props.details.address ? props.details.address : ''}</p>
+    <p>${details.address ? details.address : ''}</p>
     <p>${props.description}</p>
     <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
     </div>
@@ -47,8 +46,9 @@ const markerPopupTransformer = {
 }
 
 function setFeatureOnPopup(feature, popup) {
-  const props = feature.properties 
-  markerPopupTransformer[props.kind](popup, props)
+  const props = feature.properties
+  const details = JSON.parse(props.details)
+  markerPopupTransformer[props.kind](popup, props, details)
   popup.setLngLat(feature.geometry.coordinates)
   return popup
 }
