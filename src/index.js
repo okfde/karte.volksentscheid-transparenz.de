@@ -28,12 +28,12 @@ const makeEvent = (popup, props, details) => {
 }
 
 const markerPopupTransformer = {
-  group: (popup, props) => popup.setHTML(`
+  _group: (popup, props) => popup.setHTML(`
     <h3>Sammelgruppe ${props.name}</h3>
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
     <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
-  location: (popup, props, details) => popup.setHTML(`
+  _location: (popup, props, details) => popup.setHTML(`
     <div class="location">
     <h3>${props.name}</h3>
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
@@ -42,13 +42,13 @@ const markerPopupTransformer = {
     <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
     </div>
   `),
-  event: makeEvent
+  _event: makeEvent
 }
 
 function setFeatureOnPopup(feature, popup) {
   const props = feature.properties
   const details = JSON.parse(props.details)
-  markerPopupTransformer[props.kind](popup, props, details)
+  markerPopupTransformer[props._kind](popup, props, details)
   popup.setLngLat(feature.geometry.coordinates)
   return popup
 }
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         "circle-color": "rgba(128,128,128,0.5)"
       },
-      "filter": ["==", "kind", "group"],
+      "filter": ["==", "_kind", "group"],
     });
 
     map.addLayer({
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
       //   "circle-radius": 4,
       //   "circle-color": "#0033ee"
       // },
-      "filter": ["==", "kind", "location"],
+      "filter": ["==", "_kind", "location"],
       "layout": {
         "icon-image": "location",
         "icon-size": [
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "symbol",
       "source": "collection",
 
-      "filter": ["==", "kind", "group"],
+      "filter": ["==", "_kind", "group"],
 
       "layout": {
         "icon-image": "group",
@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
       //   "circle-radius": 4,
       //   "circle-color": "#ff33ee"
       // },
-      "filter": ["==", "kind", "event"],
+      "filter": ["==", "_kind", "event"],
 
       "layout": {
         "icon-image": "event",
