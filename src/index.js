@@ -50,7 +50,7 @@ const markerPopupTransformer = {
 function setFeatureOnPopup(feature, popup) {
   const props = feature.properties
   const details = JSON.parse(props.details)
-  markerPopupTransformer[props._kind](popup, props, details)
+  markerPopupTransformer[props.kind](popup, props, details)
   popup.setLngLat(feature.geometry.coordinates)
   return popup
 }
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         "circle-color": "rgba(128,128,128,0.5)"
       },
-      "filter": ["==", "_kind", "group"],
+      "filter": ["==", "kind", "group"],
     });
 
     map.addLayer({
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       //   "circle-radius": 4,
       //   "circle-color": "#0033ee"
       // },
-      "filter": ["==", "_kind", "location"],
+      "filter": ["==", "kind", "location"],
       "layout": {
         "icon-image": "location",
         "icon-size": [
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "symbol",
       "source": "collection",
 
-      "filter": ["==", "_kind", "group"],
+      "filter": ["==", "kind", "group"],
 
       "layout": {
         "icon-image": "group",
@@ -249,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "symbol",
       "source": "collection",
 
-      "filter": ["==", "_kind", "dropoff"],
+      "filter": ["==", "kind", "dropoff"],
 
       "layout": {
         "icon-image": "dropoff",
@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "symbol",
       "source": "collection",
 
-      "filter": ["==", "_kind", "material"],
+      "filter": ["==", "kind", "material"],
 
       "layout": {
         "icon-image": "material",
@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
       //   "circle-radius": 4,
       //   "circle-color": "#ff33ee"
       // },
-      "filter": ["==", "_kind", "event"],
+      "filter": ["==", "kind", "event"],
 
       "layout": {
         "icon-image": "event",
