@@ -3,14 +3,15 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import 'normalize.css/normalize.css';
 import groupIcon from './assets/embassy.png';
-import locationIcon from './assets/marker.png';
+import collectionIcon from './assets/marker.png';
 import dropoffIcon from './assets/racetrack.png';
 import eventIcon from './assets/star.png';
 import materialIcon from './assets/warehouse.png';
 import './styles/index.scss';
 
 
-const COLLECTION_URL = 'https://orga.baumentscheid.de/api/collection/'
+// const COLLECTION_URL = 'https://orga.baumentscheid.de/api/collection/'
+const COLLECTION_URL = 'https://corsproxy.io/?https%3A%2F%2Forga.baumentscheid.de%2Fapi%2Fcollection%2F%3Fformat%3Djson'
 
 function getData (url = '') {
   return window.fetch(url, {
@@ -30,21 +31,21 @@ const makeEvent = (popup, props, details) => {
 }
 
 const markerPopupTransformer = {
-  _group: (popup, props) => popup.setHTML(`
+  group: (popup, props) => popup.setHTML(`
     <h3>Sammelgruppe ${props.name}</h3>
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
     <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
   `),
-  _location: (popup, props, details) => popup.setHTML(`
-    <div class="location">
+  collection: (popup, props, details) => popup.setHTML(`
+    <div class="collection">
     <h3>${props.name}</h3>
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
     <p>${details.address ? details.address : ''}</p>
-    <p>${props.description}</p>
+    <p><pre>${props.description}</pre></p>
     <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
     </div>
   `),
-  _event: makeEvent
+  event: makeEvent
 }
 
 function setFeatureOnPopup(feature, popup) {
@@ -104,7 +105,7 @@ const metersToPixelsAtMaxZoom = (meters, latitude) =>
 
 const icons = [
   ['group', groupIcon],
-  ['location', locationIcon],
+  ['collection', collectionIcon],
   ['event', eventIcon],
   ['dropoff', dropoffIcon],
   ['material', materialIcon],
@@ -194,16 +195,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     map.addLayer({
-      "id": "locations",
+      "id": "collections",
       "type": "symbol",
       "source": "collection",
       // "paint": {
       //   "circle-radius": 4,
       //   "circle-color": "#0033ee"
       // },
-      "filter": ["==", "kind", "location"],
+      "filter": ["==", "kind", "collection"],
       "layout": {
-        "icon-image": "location",
+        "icon-image": "collection",
         "icon-size": [
           'interpolate',
           ['linear'],
@@ -215,9 +216,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    map.on('click', 'locations', featureClick);
-    map.on('mouseenter', 'locations', featureHover)
-    map.on('mouseleave', 'locations', featureUnhover);
+    map.on('click', 'collections', featureClick);
+    map.on('mouseenter', 'collections', featureHover)
+    map.on('mouseleave', 'collections', featureUnhover);
 
     map.addLayer({
       "id": "groups_marker",
@@ -315,10 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ]
       }
     });
-
-    map.on('click', 'events', featureClick);
-    map.on('mouseenter', 'events', featureHover)
-    map.on('mouseleave', 'events', featureUnhover);
 
     map.on('click', 'groups', featureClick);
     map.on('mouseenter', 'groups', featureHover)
