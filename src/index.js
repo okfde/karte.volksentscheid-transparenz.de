@@ -2,9 +2,11 @@ import maplibregl from 'maplibre-gl';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import 'normalize.css/normalize.css';
-import groupIcon from './assets/embassy-15.svg.png';
-import locationIcon from './assets/marker-11.svg.png';
-import eventIcon from './assets/star-15.svg.png';
+import groupIcon from './assets/embassy.png';
+import locationIcon from './assets/marker.png';
+import dropoffIcon from './assets/racetrack.png';
+import eventIcon from './assets/star.png';
+import materialIcon from './assets/warehouse.png';
 import './styles/index.scss';
 
 
@@ -57,7 +59,7 @@ function createMarker(feature) {
   const popup = createPopup(feature)
   const props = feature.properties
   // create DOM element for the marker
-  var el = document.createElement('div')
+  const el = document.createElement('div')
   el.id = `marker-${item.id}`
   el.className = `marker marker-${props.kind}`
 
@@ -100,13 +102,15 @@ function featureUnhover (e) {
 const metersToPixelsAtMaxZoom = (meters, latitude) =>
   meters / 0.075 / Math.cos(latitude * Math.PI / 180)
 
-var icons = [
+const icons = [
   ['group', groupIcon],
   ['location', locationIcon],
   ['event', eventIcon],
+  ['dropoff', dropoffIcon],
+  ['material', materialIcon],
 ]
 
-var bounds = [
+const bounds = [
   [12.9, 52.3], // Southwest coordinates
   [13.8, 52.7]  // Northeast coordinates
 ];
@@ -238,6 +242,55 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on('click', 'groups_marker', featureClick);
     map.on('mouseenter', 'groups_marker', featureHover)
     map.on('mouseleave', 'groups_marker', featureUnhover);
+
+
+    map.addLayer({
+      "id": "dropoff_marker",
+      "type": "symbol",
+      "source": "collection",
+
+      "filter": ["==", "_kind", "dropoff"],
+
+      "layout": {
+        "icon-image": "dropoff",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
+    });
+    map.on('click', 'dropoff_marker', featureClick);
+    map.on('mouseenter', 'dropoff_marker', featureHover)
+    map.on('mouseleave', 'dropoff_marker', featureUnhover);
+
+
+    map.addLayer({
+      "id": "material_marker",
+      "type": "symbol",
+      "source": "collection",
+
+      "filter": ["==", "_kind", "material"],
+
+      "layout": {
+        "icon-image": "material",
+        "icon-size": [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          10, 0.4,
+          12, 0.6,
+          14, 1,
+        ]
+      }
+    });
+
+    map.on('click', 'material_marker', featureClick);
+    map.on('mouseenter', 'material_marker', featureHover)
+    map.on('mouseleave', 'material_marker', featureUnhover);
 
     map.addLayer({
       "id": "events",
