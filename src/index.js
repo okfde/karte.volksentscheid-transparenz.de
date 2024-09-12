@@ -205,13 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
       "filter": ["==", "kind", "collection"],
       "layout": {
         "icon-image": "collection",
+        "icon-allow-overlap": true,
         "icon-size": [
           'interpolate',
           ['linear'],
           ['zoom'],
           10, 0.4,
-          12, 0.6,
-          14, 1,
+          14, 0.6,
+          16, 1,
         ]
       }
     });
@@ -224,10 +225,11 @@ document.addEventListener("DOMContentLoaded", () => {
       "id": "groups_marker",
       "type": "symbol",
       "source": "collection",
-
+      
       "filter": ["==", "kind", "group"],
-
+      
       "layout": {
+        "icon-allow-overlap": true,
         "icon-image": "group",
         "icon-size": [
           'interpolate',
@@ -254,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       "layout": {
         "icon-image": "dropoff",
+        "icon-allow-overlap": true,
         "icon-size": [
           'interpolate',
           ['linear'],
@@ -275,9 +278,10 @@ document.addEventListener("DOMContentLoaded", () => {
       "source": "collection",
 
       "filter": ["==", "kind", "material"],
-
+      
       "layout": {
         "icon-image": "material",
+        "icon-allow-overlap": true,
         "icon-size": [
           'interpolate',
           ['linear'],
@@ -305,6 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       "layout": {
         "icon-image": "event",
+        "icon-allow-overlap": true,
         "symbol-z-order": "source",
         "icon-size": [
           'interpolate',
