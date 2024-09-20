@@ -32,9 +32,9 @@ const makeEvent = (popup, props, details) => {
 
 const markerPopupTransformer = {
   group: (popup, props) => popup.setHTML(`
-    <h3>Sammelgruppe ${props.name}</h3>
+    <h3>Kiez-Team ${props.name}</h3>
     <p><a target="_blank" href="${props.url}">Details &rarr;</a></p>
-    <p><a class="btn" target="_blank" href="${props.url}">Der Gruppe beitreten</a></p>
+    <p><a class="btn" target="_blank" href="${props.url}">Dem Team beitreten</a></p>
   `),
   collection: (popup, props, details) => popup.setHTML(`
     <div class="collection">
@@ -42,7 +42,7 @@ const markerPopupTransformer = {
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
     <p>${details.address ? details.address : ''}</p>
     <p><pre>${props.description}</pre></p>
-    <p><small><a target="_blank" href="${props.url}">Problem melden</a></small></p>
+    <p><small><a target="_blank" href="${props.url}">Feedback zu dem Ort</a></small></p>
     </div>
   `),
   event: makeEvent
