@@ -41,19 +41,35 @@ const markerPopupTransformer = {
     <div class="collection">
     <h3>${props.name}</h3>
     <p><strong>Hier kannst du vor Ort unterschreiben!</strong></p>
-    <p>${details.address ? details.address : ''}</p>
-    <p><pre>${props.description}</pre></p>
-    <p><small><a target="_blank" href="${props.url}">Feedback zu dem Ort</a></small></p>
+    <p>${details.address}</p>
+    <div class="">${props.description}</div>
+    <p>
+    Liste voll oder fehlt? <a target="_blank" href="${props.url}">Feedback zu diesem Ort geben</a>
+    </p>
     </div>
   `),
-  event: makeEvent
+  event: makeEvent,
+  dropoff: (popup, props, details) => popup.setHTML(`
+    <h3>${props.name}</h3>
+    <p>${details.address}</p>
+    <p><a class="btn" target="_blank" href="${props.url}">Details &rarr;</a></p>
+  `),
+  material: (popup, props, details) => popup.setHTML(`
+    <h3>Materiallager ${props.name}</h3>
+    <p>${details.address}</p>
+    <div class="">${props.description}</div>
+  `)
 }
 
-function setFeatureOnPopup(feature, popup) {
+function setFeatureOnPopup(feature, popup, event) {
   const props = feature.properties
   const details = JSON.parse(props.details)
   markerPopupTransformer[props.kind](popup, props, details)
-  popup.setLngLat(feature.geometry.coordinates)
+  if (feature.geometry.type === 'Point') {
+    popup.setLngLat(feature.geometry.coordinates)
+  } else {
+    popup.setLngLat(event.lngLat)
+  }
   return popup
 }
 
@@ -85,7 +101,7 @@ function featureClick (e) {
   }
   const feature = e.features[0]
   const popup = new maplibregl.Popup({ offset: 10 })
-  setFeatureOnPopup(feature, popup)
+  setFeatureOnPopup(feature, popup, e)
   popup.addTo(map)
   openedPopup()
   // map.flyTo({
@@ -170,6 +186,16 @@ document.addEventListener("DOMContentLoaded", () => {
   Promise.all([dataReady, mapLoaded, ...loadIcons]).then((promiseResults) => {
     const data = promiseResults[0]
 
+    const layers = map.getStyle().layers;
+    // Find the index of the first symbol layer in the map style
+    let firstSymbolId;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+        }
+    }
+
     // sort closer dates higher
     data.features.sort(dateSort)
 
@@ -177,23 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "type": "geojson",
       "data": data
     })
-
-    map.addLayer({
-      "id": "groups",
-      "type": "circle",
-      "source": "collection",
-      "paint": {
-        "circle-radius": {
-          "stops": [
-            [0, 0],
-            [20, metersToPixelsAtMaxZoom(450, 52)]
-          ],
-          "base": 2
-        },
-        "circle-color": "rgba(128,128,128,0.5)"
-      },
-      "filter": ["==", "kind", "group"],
-    });
 
     map.addLayer({
       "id": "collections",
@@ -222,30 +231,30 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on('mouseenter', 'collections', featureHover)
     map.on('mouseleave', 'collections', featureUnhover);
 
-    map.addLayer({
-      "id": "groups_marker",
-      "type": "symbol",
-      "source": "collection",
+    // map.addLayer({
+    //   "id": "groups_marker",
+    //   "type": "symbol",
+    //   "source": "collection",
       
-      "filter": ["==", "kind", "group"],
+    //   "filter": ["==", "kind", "group"],
       
-      "layout": {
-        "icon-allow-overlap": true,
-        "icon-image": "group",
-        "icon-size": [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          10, 0.4,
-          12, 0.6,
-          14, 1,
-        ]
-      }
-    });
+    //   "layout": {
+    //     "icon-allow-overlap": true,
+    //     "icon-image": "group",
+    //     "icon-size": [
+    //       'interpolate',
+    //       ['linear'],
+    //       ['zoom'],
+    //       10, 0.4,
+    //       12, 0.6,
+    //       14, 1,
+    //     ]
+    //   }
+    // });
 
-    map.on('click', 'groups_marker', featureClick);
-    map.on('mouseenter', 'groups_marker', featureHover)
-    map.on('mouseleave', 'groups_marker', featureUnhover);
+    // map.on('click', 'groups_marker', featureClick);
+    // map.on('mouseenter', 'groups_marker', featureHover)
+    // map.on('mouseleave', 'groups_marker', featureUnhover);
 
 
     map.addLayer({
@@ -327,6 +336,58 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on('mouseenter', 'groups', featureHover)
     map.on('mouseleave', 'groups', featureUnhover);
 
+    map.addLayer({
+      "id": "groups-line",
+      "type": "line",
+      "source": "collection",
+      "paint": {
+        // "circle-radius": {
+        //   "stops": [
+        //     [0, 0],
+        //     [20, metersToPixelsAtMaxZoom(450, 52)]
+        //   ],
+        //   "base": 2
+        // },
+        // "circle-color": "rgba(128,128,128,0.5)"
+        "line-color": "#0a3b49",
+        "line-width": 5,
+        // "line-blur": 3,
+      },
+      "filter": ["==", "kind", "group"],
+    }, firstSymbolId);
+
+    map.addLayer({
+      "id": "groups-fill",
+      "type": "fill",
+      "source": "collection",
+      "paint": {
+        // "circle-radius": {
+        //   "stops": [
+        //     [0, 0],
+        //     [20, metersToPixelsAtMaxZoom(450, 52)]
+        //   ],
+        //   "base": 2
+        // },
+        // "circle-color": "rgba(128,128,128,0.5)"
+        "fill-opacity": [
+          'interpolate',
+          ['exponential', 0.5],
+          ['zoom'],
+          10,
+          1,
+          16,
+          0
+        ],
+        "fill-color":"#fbbb10",
+      },
+      "filter": ["==", "kind", "group"],
+    }, 'groups-line');
+
+    map.on('click', 'groups-fill', featureClick);
+    // map.on('mouseenter', 'groups-fill', featureHover)
+    // map.on('mouseleave', 'groups-fill', featureUnhover);
+
+    
 
   })
   
