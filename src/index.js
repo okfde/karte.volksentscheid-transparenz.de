@@ -14,7 +14,8 @@ const COLLECTION_URL = 'https://orga.baumentscheid.de/api/collection/'
 // const COLLECTION_URL = 'https://corsproxy.io/?https%3A%2F%2Forga.baumentscheid.de%2Fapi%2Fcollection%2F%3Fformat%3Djson&timestamp=123'
 // const COLLECTION_URL = 'http://localhost:8000/api/collection/'
 
-function getData (url = '') {
+function getData (url) {
+  url += '?cache=' + Math.round(Date.now() / (60 * 1000))
   return window.fetch(url, {
     method: 'GET',
     headers: {
