@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ['exponential', 0.5],
           ['zoom'],
           10,
-          0.8,
+          0.6,
           16,
           0
         ],
