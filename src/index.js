@@ -130,8 +130,8 @@ const icons = [
 ]
 
 const bounds = [
-  [12.9, 52.3], // Southwest coordinates
-  [13.8, 52.7]  // Northeast coordinates
+  [12.6, 52.0], // Southwest coordinates
+  [14.1, 53.0]  // Northeast coordinates
 ];
 
 
@@ -147,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mapLoaded = new Promise((resolve) => {
     map.on('load', () => {
       map.resize()
+      map.fitBounds(bounds, { padding: 30 });
       resolve()
     })
   })
@@ -186,6 +187,9 @@ document.addEventListener("DOMContentLoaded", () => {
   })
   Promise.all([dataReady, mapLoaded, ...loadIcons]).then((promiseResults) => {
     const data = promiseResults[0]
+    if (data === undefined) {
+      return
+    }
 
     const layers = map.getStyle().layers;
     // Find the index of the first symbol layer in the map style
