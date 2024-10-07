@@ -142,6 +142,7 @@ const map = new maplibregl.Map({
   style: 'https://tiles.versatiles.org/assets/styles/graybeard.json',
   maxBounds: bounds
 });
+map.addControl(new maplibregl.NavigationControl({showCompass: false}));
 
 document.addEventListener("DOMContentLoaded", () => {
   const mapLoaded = new Promise((resolve) => {
