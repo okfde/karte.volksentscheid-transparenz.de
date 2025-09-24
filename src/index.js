@@ -1,5 +1,6 @@
 import maplibregl from 'maplibre-gl';
 
+import { graybeard } from "@versatiles/style";
 import 'maplibre-gl/dist/maplibre-gl.css';
 import 'normalize.css/normalize.css';
 import groupIcon from './assets/embassy.png';
@@ -13,6 +14,24 @@ import './styles/index.scss';
 const COLLECTION_URL = 'https://orga.baumentscheid.de/api/collection/'
 // const COLLECTION_URL = 'https://corsproxy.io/?https%3A%2F%2Forga.baumentscheid.de%2Fapi%2Fcollection%2F%3Fformat%3Djson&timestamp=123'
 // const COLLECTION_URL = 'http://localhost:8000/api/collection/'
+
+
+export const getMapStyle = () => {
+  const options = {
+    baseUrl: 'https://tiles.versatiles.org/',
+  }
+  const mapStyle = graybeard(options)
+  mapStyle.glyphs = "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf"
+  mapStyle.sprite = "https://tiles.versatiles.org/assets/sprites/basics/sprites"
+  mapStyle.layers.forEach((layer) => {
+    if (layer.id === "building") {
+      const stops = layer.paint["fill-opacity"]["stops"]
+      stops[stops.length - 1][1] = 0.6
+    }
+  })
+
+  return mapStyle
+}
 
 function getData (url) {
   url += '?cache=' + Math.round(Date.now() / (60 * 1000))
@@ -139,7 +158,7 @@ const map = new maplibregl.Map({
   center: [13.4, 52.5],
   zoom: 10,
   container: 'map',
-  style: 'https://tiles.versatiles.org/assets/styles/graybeard.json',
+  style: getMapStyle(),
   maxBounds: bounds
 });
 map.addControl(new maplibregl.NavigationControl({showCompass: false}));
